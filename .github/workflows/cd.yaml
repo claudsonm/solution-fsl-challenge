@@ -9,6 +9,7 @@ on:
 
 jobs:
   deploy:
+    environment: ${{ github.ref_name }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
