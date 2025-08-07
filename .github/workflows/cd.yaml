@@ -8,6 +8,29 @@ on:
       - prod
 
 jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.12.2"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.3.1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.REGION }}
+
+      - run: terraform init
+
+      - run: terraform workspace select ${{ github.ref_name }}
+
+      - run: terraform apply -auto-approve -var-file=environments/${{ github.ref_name }}.tfvars
+
   deploy:
     environment: ${{ github.ref_name }}
     runs-on: ubuntu-latest

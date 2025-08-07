@@ -45,6 +45,34 @@ resource "aws_s3_bucket" "fsl_challenge_app" {
     bucket = "fsl-challenge-app-${random_string.fsl_challenge_app_suffix.id}"
 }
 
+resource "aws_s3_bucket_policy" "allow_access_from_cdn" {
+    bucket = aws_s3_bucket.fsl_challenge_app.id
+    policy = data.aws_iam_policy_document.allow_access_from_cdn.json
+}
+
+data "aws_iam_policy_document" "allow_access_from_cdn" {
+    statement {
+        principals {
+            type        = "Service"
+            identifiers = ["cloudfront.amazonaws.com"]
+        }
+
+        actions = [
+            "s3:GetObject"
+        ]
+
+        resources = [
+            "${aws_s3_bucket.fsl_challenge_app.arn}/*",
+        ]
+
+        condition {
+            test     = "StringEquals"
+            values = [aws_cloudfront_distribution.fsl_app_cdn.arn]
+            variable = "AWS:SourceArn"
+        }
+    }
+}
+
 resource "aws_s3_bucket_ownership_controls" "fsl_challenge_cdn_logs" {
     bucket = aws_s3_bucket.fsl_challenge_cdn_logs.id
     rule {
