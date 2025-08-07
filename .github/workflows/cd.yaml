@@ -27,7 +27,7 @@ jobs:
 
       - run: terraform init
 
-      - run: terraform workspace select ${{ github.ref_name }}
+      - run: terraform workspace select ${{ github.ref_name }} || terraform workspace new ${{ github.ref_name }}
 
       - run: terraform apply -auto-approve -var-file=environments/${{ github.ref_name }}.tfvars
 
