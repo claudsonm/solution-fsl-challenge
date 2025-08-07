@@ -1,9 +1,7 @@
 name: CI Pipeline
 
-on: 
+on:
   pull_request:
-    branches:
-      -main 
 
 jobs:
   build:
@@ -11,15 +9,16 @@ jobs:
 
   steps: 
     - name: Check out code
-    uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Node.js
-    uses: actions/setup-node@v2
-    with:
-      node-version: '14'
+      uses: actions/setup-node@v4
+      with:
+        node-version: '15.5.1'
+        cache: 'npm'
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci
 
     - name: Run linter
       run: npm run lint
